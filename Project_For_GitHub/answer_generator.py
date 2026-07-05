@@ -51,9 +51,11 @@ Answer the user's question using ONLY the retrieved passages below.
 
 Rules:
 - Do not use outside knowledge.
+- Use the retrieved passages even if they are partially relevant.
+- If the passages contain related challenges, limitations, evaluation issues, retrieval issues, or future research directions, synthesize them into an answer.
+- Only say that the passages do not provide enough information if they are completely unrelated to the question.
 - Answer only the user's question.
-- Do not add extra sections or unrelated details even if they appear in the retrieved passages.
-- If the retrieved passages are not enough, say that the retrieved passages do not provide enough information.
+- Do not add unrelated details.
 - Write a clear academic answer.
 - Keep the answer concise but informative.
 - Mention the sources using paper name and page number.
