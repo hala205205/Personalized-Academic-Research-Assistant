@@ -1,0 +1,128 @@
+# Project Overview
+
+## Project Title
+Personalized Academic Research Assistant
+
+## Project Idea
+This project is a research-oriented prototype for a personalized academic assistant that helps users ask questions about a collection of academic papers.
+
+The system combines Conversational Information Retrieval, Retrieval-Augmented Generation, semantic search, query rewriting, and user memory-based personalization.
+
+## Main Goal
+The main goal is to retrieve relevant passages from academic PDF papers and generate grounded answers using only the retrieved content.
+
+## Dataset
+The dataset consists of a small collection of academic PDF papers related to Retrieval-Augmented Generation, scientific literature chatbots, and memory-based retrieval.
+
+Each PDF is treated as a document, and the extracted text is divided into smaller chunks for retrieval.
+
+## Implemented Components
+
+### 1. PDF Processing
+Academic papers are loaded from the `papers/` folder.
+
+The system extracts text from the PDFs and splits the text into chunks.
+
+The chunks are saved in:
+
+data/chunks.json
+
+2. TF-IDF Baseline Retriever
+
+A simple baseline retriever was implemented using TF-IDF and cosine similarity.
+
+This method mainly depends on keyword matching.
+
+3. Semantic Retriever
+
+A semantic search retriever was implemented using Sentence Transformers.
+
+This method represents both user queries and document chunks as embeddings, then retrieves the most semantically similar passages.
+
+4. User Memory
+
+A memory module was added to store the user's research interests, previous questions, and current focus.
+
+The memory is used to support personalization.
+
+5. Personalized Ranking
+
+Retrieved passages are re-ranked using semantic similarity between the user's memory and the retrieved chunks.
+
+The final score is calculated using:
+
+Final Score = Semantic Score + Memory Bonus
+6. Gemini Query Rewriting
+
+Gemini is used to rewrite the user's question into a clearer academic search query.
+
+Gemini does not answer the question at this stage. It only improves the query before retrieval.
+
+A fallback mechanism was added so that if Gemini fails, the system uses the original query.
+
+7. Answer Generation
+
+After retrieval and personalization, Gemini generates a final answer using only the retrieved passages.
+
+The answer includes sources such as paper name and page number.
+
+8. Streamlit Interface
+
+A simple Streamlit web interface was created.
+
+The interface allows the user to:
+
+Ask a question
+View the rewritten query
+Read the final generated answer
+See the sources used
+Expand retrieved passages and view their scores
+Current Pipeline
+User Query
+→ Gemini Query Rewriting
+→ Semantic Retrieval
+→ User Memory Personalization
+→ Answer Generation
+→ Sources and Retrieved Passages
+Current Prototype Status
+
+The working prototype includes:
+
+PDF loading and chunking
+TF-IDF retrieval baseline
+Semantic search
+User memory
+Personalized ranking
+Gemini-based query rewriting
+Gemini-based grounded answer generation
+Streamlit web interface
+Notes
+
+The .env file is not included in the repository because it contains the Gemini API key.
+
+Users should create their own .env file based on .env.example.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
