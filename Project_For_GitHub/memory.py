@@ -1,8 +1,9 @@
 import os  # Used to work with folders and file paths
 import json  # Used to read and write JSON files
+from pathlib import Path
 
-
-MEMORY_FILE = "data/memory.json"  # Path where user memory will be saved
+BASE_DIR = Path(__file__).resolve().parent
+MEMORY_FILE = BASE_DIR / "data" / "memory.json"
 
 
 DEFAULT_MEMORY = {
