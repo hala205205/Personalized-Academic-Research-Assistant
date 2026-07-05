@@ -8,8 +8,10 @@ from memory import add_question  # Save user questions into memory
 from personalized_ranker import personalize_results  # Re-rank results using memory
 from answer_generator import generate_answer_with_gemini  # Generate final answer from retrieved passages
 
+from pathlib import Path  # Handle file paths correctly
 
-CHUNKS_FILE = "data/chunks.json"  # Path to the saved text chunks
+BASE_DIR = Path(__file__).resolve().parent
+CHUNKS_FILE = BASE_DIR / "data" / "chunks.json"
 MODEL_NAME = "sentence-transformers/paraphrase-MiniLM-L3-v2"  # Lightweight semantic embedding model
 
 
