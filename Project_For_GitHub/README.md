@@ -43,5 +43,8 @@ User Query
 5. Run the app:
 
 - streamlit run app.py
+## Live Demo
 
+The Streamlit app is available here:
+[Open App](https://personalized-academic-research-assistant-cwcuccgfxdhcsulhvd4ng.streamlit.app/)
 
