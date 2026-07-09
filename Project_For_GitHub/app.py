@@ -9,7 +9,7 @@ from memory import add_question
 from personalized_ranker import personalize_results
 # Re-rank results using user memory
 
-from gemini_query_rewriter import rewrite_query_with_gemini
+from gemini_query_rewriter import rewrite_query_with_history
 # Rewrite query using Gemini
 
 from answer_generator import generate_answer_with_gemini
@@ -45,26 +45,49 @@ def load_system():
 chunks, model, embeddings = load_system()
 # Initialize system
 
+if "messages" not in st.session_state:
+    # Create chat history if it does not exist
 
-query = st.text_input("Ask a question about the papers:")
-# User question input
+    st.session_state.messages = []
+    # Store conversation messages
 
 
-if st.button("Ask"):
-    # Run when user clicks Ask
+for message in st.session_state.messages:
+    # Display previous chat messages
 
-    if not query.strip():
-        # Check if question is empty
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
 
-        st.warning("Please enter a question.")
-        # Show warning
 
-    else:
-        # If user entered a question
+query = st.chat_input("Ask a question about the papers...")
+# User question input as chat
 
-        with st.spinner("Rewriting query using Gemini..."):
-            rewritten_query = rewrite_query_with_gemini(query)
-            # Rewrite query using Gemini
+
+if query:
+    # Run when user sends a message
+
+    previous_messages = st.session_state.messages.copy()
+    # Save previous conversation before adding the new question
+
+    st.session_state.messages.append({
+        "role": "user",
+        "content": query
+    })
+    # Save user message in chat history
+
+    with st.chat_message("user"):
+        st.write(query)
+        # Display user message
+
+    with st.chat_message("assistant"):
+        # Display assistant response
+
+        with st.spinner("Rewriting query using conversation history..."):
+            rewritten_query = rewrite_query_with_history(
+                query,
+                previous_messages
+            )
+            # Rewrite query using only previous conversation history
 
         st.subheader("Query Rewriting")
         st.write("**Original Query:**", query)
@@ -72,7 +95,7 @@ if st.button("Ask"):
 
         with st.spinner("Retrieving relevant passages..."):
             results = retrieve(rewritten_query, chunks, model, embeddings)
-            # Retrieve relevant chunks
+            # Retrieve relevant chunks using rewritten standalone query
 
             add_question(query)
             # Save original question in memory
@@ -84,8 +107,11 @@ if st.button("Ask"):
         # Use top 3 results for answer generation
 
         with st.spinner("Generating answer..."):
-            final_answer = generate_answer_with_gemini(query, top_results_for_answer)
-            # Generate answer from retrieved passages
+            final_answer = generate_answer_with_gemini(
+                rewritten_query,
+                top_results_for_answer
+            )
+            # Generate answer using the standalone rewritten query
 
         st.subheader("Final Answer")
         st.write(final_answer)
@@ -104,3 +130,18 @@ if st.button("Ask"):
                 st.write(f"**Final Score:** {result['final_score']:.4f}")
                 st.write("**Passage:**")
                 st.write(result["text"])
+
+        assistant_message = f"""
+Final Answer:
+{final_answer}
+
+Sources:
+{', '.join([result['paper_name'] + ' page ' + str(result['page']) for result in top_results_for_answer])}
+"""
+        # Create assistant message for chat history
+
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": assistant_message
+        })
+        # Save assistant response in chat history
