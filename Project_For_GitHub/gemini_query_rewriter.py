@@ -77,6 +77,87 @@ User query:
 
     return rewritten_query
     # Return the rewritten query
+    
+def rewrite_query_with_history(user_query, chat_history):
+    # Rewrite the user query using recent conversation history
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    # Read the Gemini API key from environment variables
+
+    if not api_key:
+        # Check if the API key is missing
+        raise ValueError("GEMINI_API_KEY is not set. Please set it first.")
+
+    client = genai.Client(api_key=api_key)
+    # Create a Gemini client
+
+    recent_history = chat_history[-4:]
+    # Use only the last 4 messages to keep the prompt short
+
+    history_text = ""
+    # Prepare conversation history text
+
+    for message in recent_history:
+        # Loop through recent chat messages
+
+        role = message["role"]
+        # Get message role: user or assistant
+
+        content = message["content"]
+        # Get message content
+
+        history_text += f"{role}: {content}\n"
+        # Add message to history text
+
+    prompt = f"""
+You are a conversational query rewriting module for an academic paper retrieval system.
+
+Your task:
+Rewrite the user's latest query into a clear standalone academic search query.
+
+Rules:
+- Do NOT answer the question.
+- Use the conversation history only to resolve pronouns and missing context.
+- Keep the user's original meaning.
+- Expand abbreviations when needed.
+- Make the query useful for retrieving relevant passages from research papers.
+- Return only the rewritten query.
+- Do not add explanations.
+
+Conversation history:
+{history_text}
+
+Latest user query:
+{user_query}
+"""
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt
+        )
+        # Send prompt to Gemini
+
+        rewritten_query = response.text.strip()
+        # Extract rewritten query
+
+    except errors.ServerError:
+        print("Gemini is temporarily unavailable. Using original query instead.")
+        rewritten_query = user_query
+        # Fallback to original query
+
+    except Exception as e:
+        print(f"Conversational rewriting failed: {e}")
+        rewritten_query = user_query
+        # Fallback to original query
+
+    if not rewritten_query or rewritten_query.lower() == "none":
+        rewritten_query = user_query
+        # If Gemini returns empty response, use original query
+
+    return rewritten_query
+    # Return rewritten query    
+    
 
 if __name__ == "__main__":
     # Run this part only when testing the file directly
