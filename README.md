@@ -152,7 +152,9 @@ The prototype uses a small collection of academic papers related to:
 ## Authors
 
 **Hala Alnajjar**
+
 **Raghad Elserhy**
+
 **Nagham Ziediah**
 
 AI and Data Science Students
